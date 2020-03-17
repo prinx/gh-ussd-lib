@@ -1,0 +1,12 @@
+{
+  "name": "Prinx/gh-ussd-lib",
+  "type": "library",
+  "description": "Write easily your USSD applications.",
+  "keywords": ["ussd"],
+  "license": "MIT",
+  "authors": [{
+    "name": "Prince Damien Dorcis-Akpaglo",
+    "email": "princedorcis@gmail.com",
+    "role": "Developer"
+  }]
+}
