@@ -10,6 +10,7 @@
     "email": "princedorcis@gmail.com",
     "role": "Developer"
   }],
+  "minimum-stability": "dev",
   "require": {
     "php": ">=5.1.0"
   }
