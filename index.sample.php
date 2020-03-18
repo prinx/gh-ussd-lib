@@ -7,6 +7,7 @@ class App
 {
     protected $params = [];
     protected $ussd;
+    
     /*
     Put messages into double quotes rather than single quotes if you wanna
     use "\n" inside the message.
@@ -84,12 +85,12 @@ class App
         if (ENV !== 'production') {
             $config['hostname'] = 'localhost';
             $config['password'] = '';
-            $config['dbname'] = 'ussd_based_app';
+            $config['dbname'] = '';
         } else {
-            $config['hostname'] = '173.16.0.8';
-            $config['password'] = 'rootpwd';
-            $config['port'] = '3308';
-            $config['dbname'] = 'txtgh_global_ussd_sessions';
+            $config['hostname'] = '';
+            $config['password'] = '';
+            $config['port'] = '';
+            $config['dbname'] = '';
         }
 
         return $config;
