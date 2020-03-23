@@ -1,4 +1,13 @@
 <?php
+/*
+ * (c) Nuna Akpaglo <princedorcis@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+namespace Prinx\USSD;
+
 define('USSD_REQUEST_INIT', '1');
 define('USSD_REQUEST_END', '17');
 define('USSD_REQUEST_CANCELLED', '30');
@@ -31,8 +40,8 @@ define('DEV', 'dev');
 define('USSD_PARAMS_NAMES', ['msisdn', 'network', 'sessionID', 'ussdString', 'ussdServiceOp']);
 
 header('Access-Control-Allow-Origin: *');
-/*
 
+/*
 Actions refer to a certain type of special menu that the app can manage automatically:
 
 USSD_WELCOME: throw the welcome menu
@@ -45,7 +54,7 @@ define('USSD_APP_ACTIONS', [USSD_WELCOME, USSD_END, USSD_BACK, USSD_SAME, USSD_C
 
 define('ASK_USER_BEFORE_RELOAD_LAST_SESSION', '__ask_user_before_reload_last_session');
 
-class USSDLib
+class USSD
 {
     protected $db;
 
@@ -152,11 +161,11 @@ class USSDLib
 
         // echo $dsn;
         try {
-            $this->db = new PDO($dsn, $user, $pass, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_PERSISTENT => true,
+            $this->db = new \PDO($dsn, $user, $pass, [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_PERSISTENT => true,
             ]);
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             exit('Unable to connect to the database. Check if the server is ON and the parameters are correct.<br/><br/>Error: ' . $e->getMessage());
         }
     }
@@ -449,7 +458,7 @@ class USSDLib
         $req = $this->db->prepare($sql);
         $req->execute(['msisdn' => $this->msisdn()]);
 
-        $result = $req->fetchAll(PDO::FETCH_ASSOC);
+        $result = $req->fetchAll(\PDO::FETCH_ASSOC);
         $req->closeCursor();
 
         if (empty($result)) {
