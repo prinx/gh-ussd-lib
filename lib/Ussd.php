@@ -111,7 +111,7 @@ class USSD
 
     protected $always_send_sms = false;
     protected $sms_sender_name = '';
-    protected $sms_endpoint = 'http://62.129.149.54:808/rest-apis/v1/sendSMS/single';
+    protected $sms_endpoint = '';
 
     protected $error = '';
     protected $default_error_msg = 'Invalid input';
