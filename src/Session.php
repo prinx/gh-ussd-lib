@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * (c) Nuna Akpaglo <princedorcis@gmail.com>
  *
  * This source file is subject to the MIT license that is bundled
