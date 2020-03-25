@@ -67,7 +67,7 @@ class USSD
         'ask_user_before_reload_last_session' => false,
         'always_send_sms' => false,
         'sms_sender_name' => '',
-        'sms_endpoint' => 'http://62.129.149.54:808/rest-apis/v1/sendSMS/single',
+        'sms_endpoint' => '',
         'default_error_msg' => 'Invalid input',
     ];
 
