@@ -1,4 +1,11 @@
 <?php
+/**
+ * (c) Nuna Akpaglo <princedorcis@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 define('USSD_REQUEST_INIT', '1');
 define('USSD_REQUEST_END', '17');
 define('USSD_REQUEST_CANCELLED', '30');
