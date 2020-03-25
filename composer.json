@@ -17,7 +17,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Prinx\\USSD\\": "lib/"
+      "Prinx\\USSD\\": "src/"
     }
   }
 }
