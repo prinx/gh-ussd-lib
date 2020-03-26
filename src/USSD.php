@@ -8,6 +8,7 @@
 
 namespace Prinx\USSD;
 
+require_once __DIR__ . '/../../dotenv/src/Dotenv.php';
 require_once 'constants.php';
 require_once 'Utils.php';
 require_once 'Validator.php';
@@ -20,9 +21,7 @@ header('Access-Control-Allow-Origin: *');
 class USSD
 {
     protected $session;
-
     protected $session_data = [];
-
     protected $validator;
 
     protected $menu_manager;
@@ -54,7 +53,7 @@ class USSD
         'splitted_menu_next_thrower' => '99',
         'splitted_menu_display' => 'More',
         'default_end_msg' => 'Goodbye',
-
+        'end_on_user_error' => false,
         /**
          * Use by the Session instance to know if it must start a new
          * session or use the user previous session, if any.
@@ -67,7 +66,7 @@ class USSD
         'ask_user_before_reload_last_session' => false,
         'always_send_sms' => false,
         'sms_sender_name' => '',
-        'sms_endpoint' => '',
+        'sms_endpoint' => 'http://62.129.149.54:808/rest-apis/v1/sendSMS/single',
         'default_error_msg' => 'Invalid input',
     ];
 
@@ -103,7 +102,7 @@ class USSD
             $this->prepare_to_launch_from_previous_session_state();
         }
 
-        $this->process_user_request();
+        $this->handle_user_request();
     }
 
     protected function hydrate($menu_manager, $ussd_params)
@@ -127,7 +126,7 @@ class USSD
         }
     }
 
-    protected function process_user_request()
+    protected function handle_user_request()
     {
         switch ($this->ussd_request_type()) {
             case USSD_REQUEST_INIT:
@@ -227,18 +226,23 @@ class USSD
 
         $user_response = $this->user_response();
 
-        $particular_item_action_defined_by_developer =
+        $user_response_exists_in_menu_actions =
         isset($this->menus[$page_id][ACTIONS][$user_response]) &&
         isset($this->menus[$page_id][ACTIONS][$user_response][ITEM_ACTION]);
 
         $next_menu_id = $this->get_next_menu_id(
             $user_response,
             $page_id,
-            $particular_item_action_defined_by_developer
+            $user_response_exists_in_menu_actions
         );
 
         if ($next_menu_id === false || !$this->menu_state_exists($next_menu_id)) {
-            $this->run_invalid_input_state('Action not defined');
+            if ($this->app_params['end_on_user_error']) {
+                $this->hard_end('Action not defined');
+            } else {
+                $this->run_invalid_input_state('Action not defined');
+            }
+
             return;
         }
 
@@ -246,7 +250,7 @@ class USSD
             $user_response,
             $page_id,
             $next_menu_id,
-            $particular_item_action_defined_by_developer
+            $user_response_exists_in_menu_actions
         );
 
         if (!$user_response_validated) {
@@ -260,7 +264,7 @@ class USSD
             $user_response,
             $page_id,
             $next_menu_id,
-            $particular_item_action_defined_by_developer
+            $user_response_exists_in_menu_actions
         );
 
         /**
@@ -287,15 +291,6 @@ class USSD
         }
 
         switch ($next_menu_id) {
-            case USSD_WELCOME:
-                $this->run_welcome_state();
-                break;
-
-            case USSD_CONTINUE_LAST_SESSION:
-                $this->set_current_menu_id($this->back_history_pop());
-                $this->run_last_session_state();
-                break;
-
             case USSD_BACK:
                 $this->run_previous_state();
                 break;
@@ -304,12 +299,21 @@ class USSD
                 $this->run_same_state_next_page();
                 break;
 
+            case USSD_END:
+                $this->hard_end();
+                break;
+
+            case USSD_WELCOME:
+                $this->run_welcome_state();
+                break;
+
             case USSD_SAME:
                 $this->run_same_state();
                 break;
 
-            case USSD_END:
-                $this->hard_end();
+            case USSD_CONTINUE_LAST_SESSION:
+                $this->set_current_menu_id($this->back_history_pop());
+                $this->run_last_session_state();
                 break;
 
             default:
@@ -333,9 +337,9 @@ class USSD
     protected function get_next_menu_id(
         $user_response,
         $page_id,
-        $particular_item_action_defined_by_developer
+        $user_response_exists_in_menu_actions
     ) {
-        if ($particular_item_action_defined_by_developer) {
+        if ($user_response_exists_in_menu_actions) {
             return $this->menus[$page_id][ACTIONS][$user_response][ITEM_ACTION];
 
         } elseif (
@@ -368,14 +372,14 @@ class USSD
         $user_response,
         $page_id,
         $next_menu_id,
-        $particular_item_action_defined_by_developer
+        $user_response_exists_in_menu_actions
     ) {
         $validate_function = 'validate_' . $page_id;
 
         if (
             method_exists($this->menu_manager, $validate_function) &&
             !(
-                $particular_item_action_defined_by_developer &&
+                $user_response_exists_in_menu_actions &&
                 in_array($next_menu_id, USSD_APP_ACTIONS, true)
             )
         ) {
@@ -399,7 +403,7 @@ class USSD
         $user_response,
         $page_id,
         $next_menu_id,
-        $particular_item_action_defined_by_developer
+        $user_response_exists_in_menu_actions
     ) {
 
         /**
@@ -416,7 +420,7 @@ class USSD
         if (
             method_exists($this->menu_manager, $call_after) &&
             !(
-                $particular_item_action_defined_by_developer &&
+                $user_response_exists_in_menu_actions &&
                 in_array($next_menu_id, USSD_APP_ACTIONS, true)
             )
         ) {
@@ -975,13 +979,6 @@ class USSD
         return array_pop($this->session_data['back_history']);
     }
 
-    public function set_error(string $error = '')
-    {
-        $this->error = $error;
-
-        return $this;
-    }
-
     public function menu_manager()
     {
         return $this->menu_manager;
@@ -1029,6 +1026,13 @@ class USSD
         }
 
         return $this->ussd_params['ussdServiceOp'];
+    }
+
+    public function set_error(string $error = '')
+    {
+        $this->error = $error;
+
+        return $this;
     }
 
     protected function set_ussd_request_type($request_type)
