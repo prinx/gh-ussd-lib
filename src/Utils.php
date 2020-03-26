@@ -14,9 +14,11 @@ class SMSUtils
 {
     public static $max_sms_content = 139;
 
-    public function send_sms($data)
+    public function send_sms(array $data, array $required_params = [])
     {
-        $required_params = ['message', 'recipient', 'sender', 'endpoint'];
+        $required_params = empty($required_params) ?
+        ['message', 'recipient', 'sender', 'endpoint'] :
+        $required_params;
 
         foreach ($required_params as $param) {
             if (!isset($data[$param])) {
