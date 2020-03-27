@@ -109,9 +109,8 @@ class USSDApp
 }
 ```
 
-We highly recommended you use a .env file to store the database credentials.
-If you are using a framework that has a `.env` file parser, you must use it.
-If you are not using a framework or your framework does not have a env parser, you can use the php `parse_ini_file` function to parse your env file.
+We highly recommend you use a .env file to store the database credentials.
+If you are not using a framework or your framework does not have a env parser, you can use the php `env` function of the library to get your env variable.
 
 Let's create the .env file at the root of the project.
 Define the parameters in the `.env` file
@@ -130,8 +129,10 @@ PROD_DB_PORT=3306
 PROD_DB_NAME=ussd_session_db_name_or_your_app_db_name
 ```
 
+The function belongs to the namespace `Prinx\Dotenv\env;`.
+You can learn more on the `env()` function in this [documentation](https://github.com/Prinx/dotenv).
 ```php
-$env = parse_ini_file('path/to/.env');
+use function Prinx\Dotenv\env;
 
 class USSDApp
 {
@@ -140,19 +141,19 @@ class USSDApp
   {
     // It's highly recommended to use a .env file to store the database credentials
     $config = [];
-
+    
     if (ENV !== 'production') {
-        $config['username'] = $env['DEV_DB_USER'];
-        $config['password'] = $env['DEV_DB_PASS'];
-        $config['hostname'] = $env['DEV_DB_HOST'];
-        $config['port'] = $env['DEV_DB_PORT'];
-        $config['dbname'] = $env['DEV_DB_NAME'];
+        $config['username'] = env('DEV_DB_USER');
+        $config['password'] = env('DEV_DB_PASS');
+        $config['hostname'] = env('DEV_DB_HOST');
+        $config['port'] = env('DEV_DB_PORT');
+        $config['dbname'] = env('DEV_DB_NAME');
     } else {
-        $config['username'] = $env['PROD_DB_USER'];
-        $config['password'] = $env['PROD_DB_PASS'];
-        $config['hostname'] = $env['PROD_DB_HOST'];
-        $config['port'] = $env['PROD_DB_PORT'];
-        $config['dbname'] = $env['PROD_DB_NAME'];
+        $config['username'] = env('PROD_DB_USER');
+        $config['password'] = env('PROD_DB_PASS');
+        $config['hostname'] = env('PROD_DB_HOST');
+        $config['port'] = env('PROD_DB_PORT');
+        $config['dbname'] = env('PROD_DB_NAME');
     }
 
     return $config;
