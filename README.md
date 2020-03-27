@@ -130,7 +130,7 @@ PROD_DB_NAME=ussd_session_db_name_or_your_app_db_name
 ```
 
 The function belongs to the namespace `Prinx\Dotenv\env;`.
-You can learn more on the `env()` function in this [documentation](https://github.com/Prinx/dotenv).
+You can learn more on the `env()` function in this [documentation](https://github.com/Prinx/dotenv/blob/master/README.md).
 ```php
 use function Prinx\Dotenv\env;
 
